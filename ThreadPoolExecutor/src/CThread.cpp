@@ -7,9 +7,9 @@
 
 #include "CThread.h"
 #include <iostream>
-pthread_mutex_t SuspendMutex=PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond=PTHREAD_COND_INITIALIZER;
-bool readyTorun,isTerminated;
+pthread_mutex_t SuspendMutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+bool readyTorun, isTerminated;
 void * task(void* context);
 CThread::~CThread() {
 	// TODO Auto-generated destructor stub
@@ -22,18 +22,15 @@ CThread::CThread() {
 
 }
 
-void CThread::terminate()
-{
-	isTerminated=true;
+void CThread::terminate() {
+	isTerminated = true;
 }
 void CThread::create_thread() {
 	//pthread_create(&t, NULL,(void*(*)(void*))&CThread::task, NULL);
 	//pthread_mutex_init(&SuspendMutex, NULL);
 	//pthread_cond_init(&cond, NULL);
-	readyTorun=false;
-	pthread_create(&t, NULL, &task, (void*)this);
-
-
+	readyTorun = false;
+	pthread_create(&t, NULL, &task, (void*) this);
 
 }
 
@@ -45,10 +42,9 @@ void CThread::run() {
 
 	pthread_mutex_lock(&SuspendMutex);
 
-
-		pthread_cond_signal(&cond);
-		if (!readyTorun)
-	readyTorun = true;
+	pthread_cond_signal(&cond);
+	if (!readyTorun)
+		readyTorun = true;
 	pthread_mutex_unlock(&SuspendMutex);
 
 }
@@ -61,21 +57,36 @@ void CThread::setTask(Threadable &tsk) {
 
 }
 
+void CThread::notify_running()
+{
+	//Thread * t= (Thread*)this;
+	//std::tr1::weak_ptr<Thread> tptr(*t);
+	_running->eventcallback( this);
+}
+
+void CThread::notify_wating()
+{
+	pthread_cond_signal(&cond);
+	_waiting->eventcallback(this);
+}
 
 void * task(void* context) {
 //	while(!isTerminated)
 	//{
-	pthread_mutex_lock(&SuspendMutex);
+	while (true) {
+		pthread_mutex_lock(&SuspendMutex);
 
-	while (!readyTorun)
-		pthread_cond_wait(&cond, &SuspendMutex);
+		while (!readyTorun)
+			pthread_cond_wait(&cond, &SuspendMutex);
+		((CThread*) context)->notify_running();
+		((CThread*) context)->getTask()->threadRunner();
 
+		readyTorun = false;
+		((CThread*) context)->notify_wating();
 
-	((CThread*) context)->getTask()->threadRunner();
+		pthread_mutex_unlock(&SuspendMutex);
 
-	readyTorun = false;
-	pthread_mutex_unlock(&SuspendMutex);
-	//}
-
+	}	//}
 
 }
+
