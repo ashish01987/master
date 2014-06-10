@@ -7,6 +7,8 @@
 
 #include "CThread.h"
 #include <iostream>
+#include <tr1/memory>
+using namespace std::tr1;
 pthread_mutex_t SuspendMutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 bool readyTorun, isTerminated;
@@ -60,14 +62,13 @@ void CThread::setTask(Threadable &tsk) {
 void CThread::notify_running()
 {
 	//Thread * t= (Thread*)this;
-	//std::tr1::weak_ptr<Thread> tptr(*t);
-	_running->eventcallback( this);
+
 }
 
 void CThread::notify_wating()
 {
 	pthread_cond_signal(&cond);
-	_waiting->eventcallback(this);
+
 }
 
 void * task(void* context) {
@@ -78,11 +79,13 @@ void * task(void* context) {
 
 		while (!readyTorun)
 			pthread_cond_wait(&cond, &SuspendMutex);
-		((CThread*) context)->notify_running();
+		std::tr1::weak_ptr<Thread> sr;
+		sr.lock().reset(((CThread*) context));
+		((CThread*) context)->_dispatcher->notifyALL(std::tr1::shared_ptr<Event>(new ThreadEvent(sr)));
 		((CThread*) context)->getTask()->threadRunner();
 
 		readyTorun = false;
-		((CThread*) context)->notify_wating();
+		((CThread*) context)->_dispatcher->notifyALL(std::tr1::shared_ptr<Event>(new ThreadEvent(sr)));
 
 		pthread_mutex_unlock(&SuspendMutex);
 

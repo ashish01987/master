@@ -41,15 +41,19 @@ void ThreadPoolExecutor::addToWaitnQueue (std::tr1::weak_ptr<Thread> t)
 
 	_idlethreads.push(t.lock());
 }
+ void ThreadPoolExecutor:: handle_event(std::tr1::weak_ptr<Event> e)
+ {
+	 shared_ptr<ThreadEvent> tevent = std::tr1::dynamic_pointer_cast<ThreadEvent> (e.lock());
+	 shared_ptr<Thread> th=std::tr1::dynamic_pointer_cast<Thread>(tevent->getSource().lock());
+	 _idlethreads.push(th);
+ }
 
 void ThreadPoolExecutor::createidleThread()
 {
 	std::tr1::shared_ptr<Thread> t1(&tf->getThread());
 	std::tr1::shared_ptr<Thread> t2(&tf->getThread());
-	t1->set_notify_running_callback(*t1->isRunning());
-	t1->set_notify_running_callback(*t2->isRunning());
-	t1->set_notify_waiting_callback(*t1->isWaiting());
-	t1->set_notify_waiting_callback(*t2->isWaiting());
+Thread::_dispatcher= new EventDispatcher();
+Thread::_dispatcher->addListener(this);
 	_idlethreads.push(t1);
 	_idlethreads.push(t2);
 

@@ -16,7 +16,7 @@
 #include <vector>
 using namespace std::tr1;
 
- class ThreadPoolExecutor {
+ class ThreadPoolExecutor:public EventListener {
 	std::tr1::weak_ptr<Queue<Threadable> > _queue;
 	std::tr1::shared_ptr<ThreadDirector> d;
 	std::queue<std::tr1::shared_ptr<Thread> > _idlethreads;
@@ -38,6 +38,7 @@ public:
 	std::tr1::shared_ptr<Thread> getFreeThread();
 	void addToWaitnQueue(std::tr1::weak_ptr<Thread>);
 	void addToRunnQueue(std::tr1::weak_ptr<Thread>);
+	virtual void handle_event(std::tr1::weak_ptr<Event> e);
 };
 
 #endif /* THREADPOOLEXECUTOR_H_ */
