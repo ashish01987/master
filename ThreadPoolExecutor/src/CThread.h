@@ -18,22 +18,24 @@ class CThread: public Thread {
 
 
 	void * param;
-	Threadable* tk;
+	Threadable* tk=NULL;
 	void* (*task_wait)(void*);
 
 protected :
 	virtual void create_thread();
 
 public:
+	pthread_mutex_t SuspendMutex = PTHREAD_MUTEX_INITIALIZER;
+	pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+	bool readyTorun, isTerminated,_isRunning;
 	virtual ~CThread();
 	CThread();
 	virtual void setTask(Threadable &th);
 		virtual void wait();
 		virtual void run();
 		virtual void terminate();
-		Threadable* getTask(){return tk;};
-		virtual void notify_running();
-		virtual void notify_wating();
+		Threadable* getTask();
+		virtual bool isRunning(){return _isRunning;};
 		virtual Thread& getThread(){return *this;};
 
 		//void* task(void*);

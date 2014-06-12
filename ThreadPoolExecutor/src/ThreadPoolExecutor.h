@@ -14,13 +14,29 @@
 #include "Thread.h"
 #include "ThreadFactory.h"
 #include <vector>
-using namespace std::tr1;
 
+using namespace std::tr1;
+class mycomparison
+{
+
+public:
+
+  bool operator() ( std::tr1::shared_ptr<Thread> lhs,  std::tr1::shared_ptr<Thread> rhs) const
+  {
+	  if(lhs->isRunning() && rhs->isRunning())
+		  return false;
+	  else if(!lhs->isRunning())
+		  return true;
+	  else return false;
+
+  }
+};
  class ThreadPoolExecutor:public EventListener {
 	std::tr1::weak_ptr<Queue<Threadable> > _queue;
 	std::tr1::shared_ptr<ThreadDirector> d;
 	std::queue<std::tr1::shared_ptr<Thread> > _idlethreads;
-	queue<std::tr1::shared_ptr<Thread> > _busythreads;
+	std::vector<std::tr1::shared_ptr<Thread> >_liveThread;
+	priority_queue <std::tr1::shared_ptr<Thread>,vector<std::tr1::shared_ptr<Thread> >,mycomparison > _busythreads;
 ThreadFactory *tf;
 Thread *th;
 

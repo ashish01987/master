@@ -18,33 +18,34 @@ class Event {
 public:
 	Event();
 	virtual ~Event();
-	virtual void setSource(weak_ptr<void>source){};
-	virtual weak_ptr<void> getSource(){return weak_ptr<void>();};
+	//virtual void setSource(weak_ptr<void>source){};
+	virtual void* getSource(){return NULL;};
 };
 
 class EventSource
 {
 
 };
-class ThreadEvent{
+class ThreadEvent:public Event{
+private:
+	std::tr1::weak_ptr<Thread> source;
 public:
 	ThreadEvent(){};
-	ThreadEvent(const weak_ptr<void>source)
+	ThreadEvent(const void *source)
 	{
-		std::tr1::shared_ptr<Thread> t =std::tr1::static_pointer_cast<Thread> (source.lock());
+		std::tr1::shared_ptr<Thread> t((Thread*) (source));
 				this->source=t;
 	}
 
-	const weak_ptr<void> getSource()  {
-		return source;
+	virtual void* getSource()  {
+		return (void*)source.lock().get();
 	}
 
-	void setSource(const weak_ptr<void>source) {
+	void setSource(const std::tr1:: weak_ptr<void>source) {
 		std::tr1::shared_ptr<Thread> t =std::tr1::static_pointer_cast<Thread> (source.lock());
 		this->source=t;
 	}
 
-private:
-	weak_ptr<Thread> source;
+
 };
 #endif /* EVENT_H_ */

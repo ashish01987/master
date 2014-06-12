@@ -9,9 +9,7 @@
 #include <iostream>
 #include <tr1/memory>
 using namespace std::tr1;
-pthread_mutex_t SuspendMutex = PTHREAD_MUTEX_INITIALIZER;
-pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-bool readyTorun, isTerminated;
+
 void * task(void* context);
 CThread::~CThread() {
 	// TODO Auto-generated destructor stub
@@ -23,7 +21,10 @@ CThread::CThread() {
 	create_thread();
 
 }
-
+Threadable* CThread::getTask()
+{
+	return tk;
+}
 void CThread::terminate() {
 	isTerminated = true;
 }
@@ -31,7 +32,8 @@ void CThread::create_thread() {
 	//pthread_create(&t, NULL,(void*(*)(void*))&CThread::task, NULL);
 	//pthread_mutex_init(&SuspendMutex, NULL);
 	//pthread_cond_init(&cond, NULL);
-	readyTorun = false;
+	cond = PTHREAD_COND_INITIALIZER;
+	SuspendMutex = PTHREAD_MUTEX_INITIALIZER;
 	pthread_create(&t, NULL, &task, (void*) this);
 
 }
@@ -59,35 +61,36 @@ void CThread::setTask(Threadable &tsk) {
 
 }
 
-void CThread::notify_running()
-{
-	//Thread * t= (Thread*)this;
-
-}
-
-void CThread::notify_wating()
-{
-	pthread_cond_signal(&cond);
-
-}
 
 void * task(void* context) {
 //	while(!isTerminated)
 	//{
+	CThread* thread=((CThread*) context);
+	if(!thread)
+		return NULL;
 	while (true) {
-		pthread_mutex_lock(&SuspendMutex);
+		pthread_mutex_lock(&thread->SuspendMutex);
 
-		while (!readyTorun)
-			pthread_cond_wait(&cond, &SuspendMutex);
-		std::tr1::weak_ptr<Thread> sr;
-		sr.lock().reset(((CThread*) context));
-		((CThread*) context)->_dispatcher->notifyALL(std::tr1::shared_ptr<Event>(new ThreadEvent(sr)));
-		((CThread*) context)->getTask()->threadRunner();
 
-		readyTorun = false;
-		((CThread*) context)->_dispatcher->notifyALL(std::tr1::shared_ptr<Event>(new ThreadEvent(sr)));
 
-		pthread_mutex_unlock(&SuspendMutex);
+			if(!thread->readyTorun)
+			{
+				thread->_isRunning = false;
+
+			pthread_cond_wait(&thread->cond, &thread->SuspendMutex);
+			}
+		thread->_isRunning = true;
+
+		std::tr1::shared_ptr<ThreadEvent> ev (new ThreadEvent(thread));
+		std::tr1::shared_ptr<Event> _Event=std::tr1::static_pointer_cast<Event> (ev);
+		thread->notifyALL(_Event);
+		thread->getTask()->threadRunner();
+
+		thread->_isRunning = false;
+		thread->cond = PTHREAD_COND_INITIALIZER;
+		thread->notifyALL(_Event);
+
+		pthread_mutex_unlock(&thread->SuspendMutex);
 
 	}	//}
 
