@@ -28,7 +28,7 @@ public:
 	std::tr1::shared_ptr<ThreadEvent> ev;
 	pthread_mutex_t SuspendMutex = PTHREAD_MUTEX_INITIALIZER;
 	pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
-	bool readyTorun, isTerminated,_isRunning;
+	bool readyTorun, isTerminated=false,_isRunning;
 	virtual ~CThread();
 	CThread();
 	virtual void setTask(Threadable &th);

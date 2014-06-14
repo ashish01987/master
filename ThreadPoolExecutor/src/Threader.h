@@ -13,6 +13,8 @@
 
 
 class Threader: public Threadable {
+	static int count;
+	int _id;
 public:
 	Threader();
 	virtual ~Threader();
@@ -20,6 +22,8 @@ public:
 };
 
 class Threader1: public Threadable {
+	static int count;
+	int _id;
 public:
 	Threader1();
 	virtual ~Threader1();

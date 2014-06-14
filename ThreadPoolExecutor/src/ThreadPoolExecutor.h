@@ -40,24 +40,24 @@ public:
 ThreadFactory *tf;
 Thread *th;
 void terminate();
-
+bool _terminate=false;
 public:
  	ThreadPoolExecutor(std::tr1::weak_ptr<Queue<Threadable> >  queue):_queue(queue)
 {
  		d.reset(new ThreadDirector());
  	tf=	d->getFactory(thread_type::CTHREAD);
- 	createidleThread();
+ 	createidleThread(5);
 
 } ;
 	virtual ~ThreadPoolExecutor();
 	void schedule();
-	void createidleThread();
+	void createidleThread(int i);
 	std::tr1::weak_ptr<Thread> getFreeThread();
 	void addToWaitnQueue(std::tr1::weak_ptr<Thread>);
 	void addToRunnQueue(std::tr1::weak_ptr<Thread>);
 	virtual void handle_event(std::tr1::weak_ptr<Event> e);
 	void wait();
-	bool _terminate=false;
+void shutdown();
 };
 
 #endif /* THREADPOOLEXECUTOR_H_ */

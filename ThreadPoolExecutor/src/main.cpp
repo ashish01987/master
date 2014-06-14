@@ -16,42 +16,57 @@ using namespace std;
 #include <tr1/memory>
 using namespace std::tr1;
 
-struct A:public std::tr1::enable_shared_from_this<A>
-{
-	virtual ~A(){};
-	};
-struct C:public virtual A
-{
-	virtual void f2()=0;
-	virtual ~C(){};
+struct A: public std::tr1::enable_shared_from_this<A> {
+	virtual ~A() {
+	}
+	;
 };
-struct B:public C
-{
-	void f2(){};
-	virtual ~B(){};
+struct C: public virtual A {
+	virtual void f2()=0;
+	virtual ~C() {
+	}
+	;
+};
+struct B: public C {
+	void f2() {
+	}
+	;
+	virtual ~B() {
+	}
+	;
 };
 int main() {
 	//cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
-	 std::tr1::shared_ptr<A>a;
-	 std::tr1::shared_ptr<B>b;
+	std::tr1::shared_ptr<A> a;
+	std::tr1::shared_ptr<B> b;
 	a.reset((new B()));
-	A *_a=a.get();
-	B* _bb=(dynamic_cast<B*>(_a));
-	b=dynamic_pointer_cast<B>(_bb->shared_from_this());
-	cout<<b.use_count()<<endl;
+	A *_a = a.get();
+	B* _bb = (dynamic_cast<B*>(_a));
+	b = dynamic_pointer_cast<B>(_bb->shared_from_this());
+	cout << b.use_count() << endl;
 	Queue<Threadable> queue;
 	std::tr1::shared_ptr<Queue<Threadable> > p(&queue);
 	ThreadPoolExecutor tex(p);
 
-
-	Threader th1;
-	Threader1 th2;
-	queue.Enqueue(th1);
-	queue.Enqueue(th2);
+	Threader th1[20];
+	Threader1 th2[20];
+	for (int i = 0; i < 20; i++) {
+		queue.Enqueue(th1[i]);
+		queue.Enqueue(th2[i]);
+	}
 
 	tex.schedule();
-	tex._terminate=true;
+	Threader th3[20];
+	Threader1 th4[20];
+	for (int i = 0; i < 20; i++)
+
+		queue.Enqueue(th3[i]);
+	for (int i = 0; i < 20; i++)
+		queue.Enqueue(th4[i]);
+
 	tex.schedule();
-tex.wait();
+	tex.shutdown();
+
+	tex.wait();
 	return 0;
 }

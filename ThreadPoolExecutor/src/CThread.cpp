@@ -39,7 +39,7 @@ void CThread::create_thread() {
  	pthread_create(&t, NULL, &task, (void*) this);
 	}catch(bad_cast &e)
 	{
-		cout<<e.what()<<endl;
+		//cout<<e.what()<<endl;
 	}
 
 

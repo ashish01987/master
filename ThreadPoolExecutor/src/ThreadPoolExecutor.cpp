@@ -12,6 +12,11 @@ ThreadPoolExecutor::~ThreadPoolExecutor() {
 cout<<"Pool Destroyed"<<endl;
 }
 
+void ThreadPoolExecutor::shutdown()
+{
+	_terminate=true;
+	schedule();
+}
 void ThreadPoolExecutor::schedule() {
 
 	while (!_queue.lock()->isEmpty()) {
@@ -58,20 +63,23 @@ void ThreadPoolExecutor::handle_event(std::tr1::weak_ptr<Event> e) {
 		_busythreads.pop();
 
 
-		cout<<tidle.use_count()<<endl;
+		//cout<<tidle.use_count()<<endl;
 	}
 }
 
-void ThreadPoolExecutor::createidleThread() {
+void ThreadPoolExecutor::createidleThread(int i) {
+	for(int c=0;c<i;c++)
+	{
 	std::tr1::shared_ptr<Thread> t1(tf->getThread());
-	std::tr1::shared_ptr<Thread> t2(tf->getThread());
+
 
 	t1->addListener(this);
-	t2->addListener(this);
+
 	_idlethreads.push(t1);
-	_idlethreads.push(t2);
+
 	_liveThread.push_back(t1);
-	_liveThread.push_back(t2);
+
+	}
 
 }
 
@@ -82,7 +90,7 @@ std::tr1::weak_ptr<Thread> ThreadPoolExecutor::getFreeThread() {
 		std::tr1::weak_ptr<Thread> t = _idlethreads.front();
 
 		_idlethreads.pop();
-		cout<<t.use_count()<<endl;
+	//	cout<<t.use_count()<<endl;
 		return t;
 	}
 }
