@@ -21,11 +21,11 @@ class mycomparison
 
 public:
 
-  bool operator() ( std::tr1::shared_ptr<Thread> lhs,  std::tr1::shared_ptr<Thread> rhs) const
+  bool operator() ( std::tr1::weak_ptr<Thread> lhs,  std::tr1::weak_ptr<Thread> rhs) const
   {
-	  if(lhs->isRunning() && rhs->isRunning())
+	  if(lhs.lock()->isRunning() && rhs.lock()->isRunning())
 		  return false;
-	  else if(!lhs->isRunning())
+	  else if(!rhs.lock()->isRunning())
 		  return true;
 	  else return false;
 
@@ -34,11 +34,12 @@ public:
  class ThreadPoolExecutor:public EventListener {
 	std::tr1::weak_ptr<Queue<Threadable> > _queue;
 	std::tr1::shared_ptr<ThreadDirector> d;
-	std::queue<std::tr1::shared_ptr<Thread> > _idlethreads;
+	std::queue<std::tr1::weak_ptr<Thread> > _idlethreads;
 	std::vector<std::tr1::shared_ptr<Thread> >_liveThread;
-	priority_queue <std::tr1::shared_ptr<Thread>,vector<std::tr1::shared_ptr<Thread> >,mycomparison > _busythreads;
+	priority_queue <std::tr1::weak_ptr<Thread>,vector<std::tr1::weak_ptr<Thread> >,mycomparison > _busythreads;
 ThreadFactory *tf;
 Thread *th;
+void terminate();
 
 public:
  	ThreadPoolExecutor(std::tr1::weak_ptr<Queue<Threadable> >  queue):_queue(queue)
@@ -49,12 +50,14 @@ public:
 
 } ;
 	virtual ~ThreadPoolExecutor();
-	void startThread();
+	void schedule();
 	void createidleThread();
-	std::tr1::shared_ptr<Thread> getFreeThread();
+	std::tr1::weak_ptr<Thread> getFreeThread();
 	void addToWaitnQueue(std::tr1::weak_ptr<Thread>);
 	void addToRunnQueue(std::tr1::weak_ptr<Thread>);
 	virtual void handle_event(std::tr1::weak_ptr<Event> e);
+	void wait();
+	bool _terminate=false;
 };
 
 #endif /* THREADPOOLEXECUTOR_H_ */

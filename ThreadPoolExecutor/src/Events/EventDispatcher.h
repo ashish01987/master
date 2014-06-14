@@ -10,7 +10,7 @@
 #include "EventListener.h"
 #include<set>
 #include <algorithm>
-class EventDispatcher {
+class EventDispatcher:public virtual std::tr1::enable_shared_from_this<EventDispatcher> {
 	std::vector<EventListener*> _listerns;
 public:
 	EventDispatcher();
@@ -35,6 +35,7 @@ public:
 		for (std::vector<EventListener*>::iterator it = _listerns.begin();
 				it != _listerns.end(); ++it) {
 			if (*it) {
+				int i=_listerns.size();
 				EventListener* evntL = *it;
 				evntL->handle_event(e);
 			}

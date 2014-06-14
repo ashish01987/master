@@ -12,7 +12,7 @@
 #include "Threadable.h"
 #include "Events/Event.h"
 using namespace std;
-class CThread: public Thread {
+class CThread: public Thread{
 
 	pthread_t t;
 
@@ -25,6 +25,7 @@ protected :
 	virtual void create_thread();
 
 public:
+	std::tr1::shared_ptr<ThreadEvent> ev;
 	pthread_mutex_t SuspendMutex = PTHREAD_MUTEX_INITIALIZER;
 	pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
 	bool readyTorun, isTerminated,_isRunning;
@@ -35,9 +36,10 @@ public:
 		virtual void run();
 		virtual void terminate();
 		Threadable* getTask();
+		virtual void suspend();
 		virtual bool isRunning(){return _isRunning;};
 		virtual Thread& getThread(){return *this;};
-
+	static	pthread_mutex_t SharedResoursc;
 		//void* task(void*);
 private:
 

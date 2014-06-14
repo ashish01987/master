@@ -16,8 +16,9 @@ CThreadFactory::~CThreadFactory() {
 	// TODO Auto-generated destructor stub
 }
 
-Thread & CThreadFactory::getThread()
+std::tr1::shared_ptr<Thread> CThreadFactory::getThread()
 {
- CThread *ct=new CThread();
-  return *ct;
+	std::tr1::shared_ptr<Thread> ct;
+	ct.reset(new CThread());
+  return ct;
 }

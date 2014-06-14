@@ -19,7 +19,7 @@ public:
 	virtual void wait()=0;
 	virtual void run()=0;
 	virtual void terminate()=0;
-
+virtual void suspend()=0;
 	virtual bool isRunning()=0;
 };
 

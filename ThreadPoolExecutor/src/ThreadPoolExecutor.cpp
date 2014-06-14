@@ -9,26 +9,25 @@
 
 ThreadPoolExecutor::~ThreadPoolExecutor() {
 	// TODO Auto-generated destructor stub
-
+cout<<"Pool Destroyed"<<endl;
 }
 
-void ThreadPoolExecutor::startThread() {
+void ThreadPoolExecutor::schedule() {
+
 	while (!_queue.lock()->isEmpty()) {
 
 
-		std::tr1::shared_ptr<Thread> free = getFreeThread();
-		if (free) {
+		std::tr1::weak_ptr<Thread> free = getFreeThread();
+		if (free.lock()) {
 			Threadable& thl = _queue.lock()->DeQueue();
-			free->setTask(thl);
-			free->run();
+			free.lock()->setTask(thl);
+			free.lock()->run();
 		}
 		//th->wait();
 	}
-	for (vector<std::tr1::shared_ptr<Thread> >::iterator it =
-			_liveThread.begin(); it != _liveThread.end(); ++it) {
-		(*it)->wait();
+if(_terminate)
+	terminate();
 
-	}
 }
 void ThreadPoolExecutor::addToRunnQueue(std::tr1::weak_ptr<Thread> t) {
 	_busythreads.push(t.lock());
@@ -44,18 +43,28 @@ void ThreadPoolExecutor::handle_event(std::tr1::weak_ptr<Event> e) {
 		return;
 	std::tr1::shared_ptr<ThreadEvent> tevent = std::tr1::dynamic_pointer_cast<
 			ThreadEvent>(e.lock());
-	std::tr1::shared_ptr<Thread> th((Thread*) tevent->getSource());
-	if (th->isRunning())
-		_busythreads.push(th);
+	std::tr1::weak_ptr<Thread> th=std::tr1::dynamic_pointer_cast<Thread> (tevent->getSource().lock());
+
+	if (th.lock()->isRunning())
+	{
+		std::tr1::weak_ptr<Thread> t(th);
+		//th.lock()->run();
+		_busythreads.push(t);
+	}
 	else {
+	std::tr1::weak_ptr<Thread> tidle=	_busythreads.top();
+	tidle.lock()->suspend();
+	_idlethreads.push(tidle);
 		_busythreads.pop();
-		_idlethreads.push(th);
+
+
+		cout<<tidle.use_count()<<endl;
 	}
 }
 
 void ThreadPoolExecutor::createidleThread() {
-	std::tr1::shared_ptr<Thread> t1(&tf->getThread());
-	std::tr1::shared_ptr<Thread> t2(&tf->getThread());
+	std::tr1::shared_ptr<Thread> t1(tf->getThread());
+	std::tr1::shared_ptr<Thread> t2(tf->getThread());
 
 	t1->addListener(this);
 	t2->addListener(this);
@@ -66,13 +75,32 @@ void ThreadPoolExecutor::createidleThread() {
 
 }
 
-std::tr1::shared_ptr<Thread> ThreadPoolExecutor::getFreeThread() {
+std::tr1::weak_ptr<Thread> ThreadPoolExecutor::getFreeThread() {
 	if (_idlethreads.empty())
 		return std::tr1::shared_ptr<Thread>();
 	else {
 		std::tr1::weak_ptr<Thread> t = _idlethreads.front();
-		_idlethreads.pop();
 
-		return t.lock();
+		_idlethreads.pop();
+		cout<<t.use_count()<<endl;
+		return t;
 	}
+}
+
+void ThreadPoolExecutor::terminate()
+{
+	_terminate=true;
+	for (vector<std::tr1::shared_ptr<Thread> >::iterator it =
+						_liveThread.begin(); it != _liveThread.end(); ++it) {
+					(*it)->terminate();
+
+				}
+}
+void ThreadPoolExecutor::wait()
+{
+	for (vector<std::tr1::shared_ptr<Thread> >::iterator it =
+					_liveThread.begin(); it != _liveThread.end(); ++it) {
+				(*it)->wait();
+
+			}
 }

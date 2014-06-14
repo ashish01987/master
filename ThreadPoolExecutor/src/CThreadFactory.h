@@ -16,7 +16,7 @@ class CThreadFactory: public ThreadFactory {
 public:
 	CThreadFactory();
 	virtual ~CThreadFactory();
-	virtual Thread& getThread();
+	virtual std::tr1::shared_ptr<Thread> getThread();
 };
 
 #endif /* CTHREADFACTORY_H_ */

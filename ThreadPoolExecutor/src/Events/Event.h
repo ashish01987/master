@@ -8,7 +8,7 @@
 #ifndef EVENT_H_
 #define EVENT_H_
 #include "EventDispatcher.h"
-#include "../Thread.h"
+
 #include <tr1/shared_ptr.h>
 #include <tr1/memory>
 using namespace std::tr1;
@@ -19,7 +19,7 @@ public:
 	Event();
 	virtual ~Event();
 	//virtual void setSource(weak_ptr<void>source){};
-	virtual void* getSource(){return NULL;};
+	 virtual std::tr1::weak_ptr<EventDispatcher> getSource(){return std::tr1::shared_ptr<EventDispatcher>();};
 };
 
 class EventSource
@@ -28,21 +28,21 @@ class EventSource
 };
 class ThreadEvent:public Event{
 private:
-	std::tr1::weak_ptr<Thread> source;
+	std::tr1::weak_ptr<EventDispatcher> source;
 public:
 	ThreadEvent(){};
-	ThreadEvent(const void *source)
+	ThreadEvent( std::tr1::weak_ptr<EventDispatcher> source)
 	{
-		std::tr1::shared_ptr<Thread> t((Thread*) (source));
-				this->source=t;
+
+				this->source=source;
 	}
 
-	virtual void* getSource()  {
-		return (void*)source.lock().get();
+	virtual std::tr1::weak_ptr<EventDispatcher>  getSource()  {
+		return  source;
 	}
 
 	void setSource(const std::tr1:: weak_ptr<void>source) {
-		std::tr1::shared_ptr<Thread> t =std::tr1::static_pointer_cast<Thread> (source.lock());
+		std::tr1::shared_ptr<EventDispatcher> t =std::tr1::static_pointer_cast<EventDispatcher> (source.lock());
 		this->source=t;
 	}
 
