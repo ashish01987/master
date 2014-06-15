@@ -10,7 +10,7 @@
 #include "EventListener.h"
 #include<set>
 #include <algorithm>
-class EventDispatcher:public virtual std::tr1::enable_shared_from_this<EventDispatcher> {
+class EventDispatcher{
 	std::vector<EventListener*> _listerns;
 public:
 	EventDispatcher();

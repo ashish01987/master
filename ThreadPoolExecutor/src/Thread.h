@@ -10,10 +10,16 @@
 #include "Threadable.h"
 #include "Events/EventDispatcher.h"
 #include <tr1/memory>
-
-class Thread:public  virtual EventDispatcher  {
+	class PoolResoureSync{
+	public:
+	virtual	void blockAllThreads()=0;
+	virtual	void releaseAllThreads()=0;
+	virtual ~PoolResoureSync(){};
+	};
+class Thread:public  virtual EventDispatcher,public virtual std::tr1::enable_shared_from_this<Thread>  {
 public:
-
+	virtual int getThreadId()=0;
+	static PoolResoureSync* __poolSync;
 	virtual ~Thread(){};
 	virtual void setTask(Threadable& t)=0;
 	virtual void wait()=0;
@@ -21,6 +27,8 @@ public:
 	virtual void terminate()=0;
 virtual void suspend()=0;
 	virtual bool isRunning()=0;
+	virtual void createThread()=0;
+
 };
 
 #endif /* THREAD_H_ */

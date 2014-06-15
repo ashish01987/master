@@ -8,7 +8,7 @@
 #ifndef THREADDIRECTOR_H_
 #define THREADDIRECTOR_H_
 #include "CThreadFactory.h"
-#include "CThread.h"
+
 class ThreadFactory;
 class Thread;
 enum thread_type {CTHREAD};

@@ -11,6 +11,7 @@
 
 #include <tr1/shared_ptr.h>
 #include <tr1/memory>
+#include "../Thread.h"
 using namespace std::tr1;
 
 class Event {
@@ -28,23 +29,19 @@ class EventSource
 };
 class ThreadEvent:public Event{
 private:
-	std::tr1::weak_ptr<EventDispatcher> source;
+	std::tr1::weak_ptr<Thread> source;
 public:
 	ThreadEvent(){};
-	ThreadEvent( std::tr1::weak_ptr<EventDispatcher> source)
+	ThreadEvent( std::tr1::weak_ptr<Thread> source)
 	{
 
 				this->source=source;
 	}
 
 	virtual std::tr1::weak_ptr<EventDispatcher>  getSource()  {
-		return  source;
+		return  std::tr1::dynamic_pointer_cast<EventDispatcher> (source.lock());
 	}
 
-	void setSource(const std::tr1:: weak_ptr<void>source) {
-		std::tr1::shared_ptr<EventDispatcher> t =std::tr1::static_pointer_cast<EventDispatcher> (source.lock());
-		this->source=t;
-	}
 
 
 };

@@ -9,7 +9,7 @@
 #define CTHREADFACTORY_H_
 
 #include "ThreadFactory.h"
-#include "CThread.h"
+
 class Thread;
 class CThreadFactory: public ThreadFactory {
 

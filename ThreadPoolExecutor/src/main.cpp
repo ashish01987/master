@@ -48,24 +48,24 @@ int main() {
 	std::tr1::shared_ptr<Queue<Threadable> > p(&queue);
 	ThreadPoolExecutor tex(p);
 
-	Threader th1[20];
-	Threader1 th2[20];
-	for (int i = 0; i < 20; i++) {
+	Threader th1[2];
+	Threader1 th2[2];
+	for (int i = 0; i < 2; i++) {
 		queue.Enqueue(th1[i]);
 		queue.Enqueue(th2[i]);
 	}
 
 	tex.schedule();
-	Threader th3[20];
+	/*Threader th3[20];
 	Threader1 th4[20];
 	for (int i = 0; i < 20; i++)
 
 		queue.Enqueue(th3[i]);
 	for (int i = 0; i < 20; i++)
-		queue.Enqueue(th4[i]);
+		queue.Enqueue(th4[i]);*/
 
-	tex.schedule();
-	tex.shutdown();
+	//tex.schedule();
+//	tex.shutdown();
 
 	tex.wait();
 	return 0;
