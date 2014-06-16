@@ -16,38 +16,26 @@
 #include <vector>
 #include <map>
 using namespace std::tr1;
-class mycomparison
-{
 
-public:
-
-  bool operator() ( std::tr1::weak_ptr<Thread> lhs,  std::tr1::weak_ptr<Thread> rhs) const
-  {
-
-	   if(rhs.lock()->isRunning()||lhs.lock()->isRunning())
-		  return true;
-	   return false;
-
-  }
-};
- class ThreadPoolExecutor:public EventListener {
+class ThreadPoolExecutor: public EventListener {
 	std::tr1::weak_ptr<Queue<Threadable> > _queue;
 	std::tr1::shared_ptr<ThreadDirector> d;
 	std::queue<std::tr1::weak_ptr<Thread> > _idlethreads;
-	std::vector<std::tr1::shared_ptr<Thread> >_liveThread;
-	std::map <int,std::tr1::weak_ptr<Thread> > _busythreads;
-ThreadFactory *tf;
-Thread *th;
-void terminate();
-bool _terminate=false;
-public:
- 	ThreadPoolExecutor(std::tr1::weak_ptr<Queue<Threadable> >  queue):_queue(queue)
-{
- 		d.reset(new ThreadDirector());
- 	tf=	d->getFactory(thread_type::CTHREAD);
- 	createidleThread(2);
+	std::vector<std::tr1::shared_ptr<Thread> > _liveThread;
+	std::map<int, std::tr1::weak_ptr<Thread> > _busythreads;
+	ThreadFactory *tf;
 
-} ;
+	void terminate();
+	bool _terminate = false;
+public:
+	ThreadPoolExecutor(std::tr1::weak_ptr<Queue<Threadable> > queue) :
+			_queue(queue) {
+		d.reset(new ThreadDirector());
+		tf = d->getFactory(thread_type::CTHREAD);
+		createidleThread(2);
+
+	}
+	;
 	virtual ~ThreadPoolExecutor();
 	void schedule();
 	void createidleThread(int i);
@@ -55,7 +43,7 @@ public:
 
 	virtual void handle_event(std::tr1::weak_ptr<Event> e);
 	void wait();
-void shutdown();
+	void shutdown();
 };
 
 #endif /* THREADPOOLEXECUTOR_H_ */

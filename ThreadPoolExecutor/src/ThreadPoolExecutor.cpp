@@ -97,17 +97,16 @@ std::tr1::weak_ptr<Thread> ThreadPoolExecutor::getFreeThread() {
 
 void ThreadPoolExecutor::terminate() {
 	_terminate = true;
-	while(true){
-	Thread::__poolSync->blockAllThreads();
-	if(_busythreads.empty())
-	{
-		break;
-	}
-	Thread::__poolSync->releaseAllThreads();
+	while (true) {
+		Thread::__poolSync->blockAllThreads();
+		if (_busythreads.empty()) {
+			break;
+		}
+		Thread::__poolSync->releaseAllThreads();
 	}
 	for (vector<std::tr1::shared_ptr<Thread> >::iterator it =
 			_liveThread.begin(); it != _liveThread.end(); ++it) {
-		Threadable * t=NULL;
+		Threadable * t = NULL;
 		(*it)->removeAll();
 		//(*it)->setTask(*t);
 		(*it)->terminate();
@@ -115,9 +114,5 @@ void ThreadPoolExecutor::terminate() {
 	}
 }
 void ThreadPoolExecutor::wait() {
-	for (vector<std::tr1::shared_ptr<Thread> >::iterator it =
-			_liveThread.begin(); it != _liveThread.end(); ++it) {
 
-
-	}
 }
