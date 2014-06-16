@@ -37,35 +37,29 @@ struct B: public C {
 };
 int main() {
 	//cout << "!!!Hello World!!!" << endl; // prints !!!Hello World!!!
-	std::tr1::shared_ptr<A> a;
-	std::tr1::shared_ptr<B> b;
-	a.reset((new B()));
-	A *_a = a.get();
-	B* _bb = (dynamic_cast<B*>(_a));
-	b = dynamic_pointer_cast<B>(_bb->shared_from_this());
-	cout << b.use_count() << endl;
-	Queue<Threadable> queue;
-	std::tr1::shared_ptr<Queue<Threadable> > p(&queue);
+
+
+	std::tr1::shared_ptr<Queue<Threadable> > p(new Queue<Threadable>());
 	ThreadPoolExecutor tex(p);
 
-	Threader th1[2];
-	Threader1 th2[2];
-	for (int i = 0; i < 2; i++) {
-		queue.Enqueue(th1[i]);
-		queue.Enqueue(th2[i]);
+	Threader th1[2000];
+	Threader1 th2[2000];
+	for (int i = 0; i < 2000; i++) {
+		p->Enqueue(th1[i]);
+		p->Enqueue(th2[i]);
 	}
 
 	tex.schedule();
-	/*Threader th3[20];
+	Threader th3[20];
 	Threader1 th4[20];
 	for (int i = 0; i < 20; i++)
 
-		queue.Enqueue(th3[i]);
+		p->Enqueue(th3[i]);
 	for (int i = 0; i < 20; i++)
-		queue.Enqueue(th4[i]);*/
+		p->Enqueue(th4[i]);
 
-	//tex.schedule();
-//	tex.shutdown();
+	tex.schedule();
+	tex.shutdown();
 
 	tex.wait();
 	return 0;

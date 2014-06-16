@@ -15,6 +15,6 @@ EventListener::EventListener() {
 
 EventListener::~EventListener() {
 	// TODO Auto-generated destructor stub
-cout<<"Event destroyed"<<endl;
+//cout<<"Event destroyed"<<endl;
 }
 

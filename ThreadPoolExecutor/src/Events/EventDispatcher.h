@@ -34,11 +34,10 @@ public:
 			return;
 		for (std::vector<EventListener*>::iterator it = _listerns.begin();
 				it != _listerns.end(); ++it) {
-			if (*it) {
-				int i=_listerns.size();
+
 				EventListener* evntL = *it;
 				evntL->handle_event(e);
-			}
+
 		}
 
 	}

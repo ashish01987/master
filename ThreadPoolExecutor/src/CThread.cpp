@@ -17,7 +17,9 @@ int CThread::count=0;
 void * task(void* context);
 CThread::~CThread() {
 	// TODO Auto-generated destructor stub
+	if(__poolSync)
 	delete __poolSync;
+	__poolSync=NULL;
 	cout << "Thread Destroyed" << endl;
 }
 
@@ -56,9 +58,12 @@ void CThread::run() {
 
 	pthread_mutex_lock(&SuspendMutex);
 
-	pthread_cond_signal(&cond);
+
 	if (!readyTorun)
+	{
+		pthread_cond_signal(&cond);
 		readyTorun = true;
+	}
 	pthread_mutex_unlock(&SuspendMutex);
 
 }
@@ -89,7 +94,7 @@ void * task(void* context) {
 
 	pthread_mutex_lock(&CThread::SharedResoursc);
 	thread->notifyALL(thread->_Event);
-	cout << "Thread first run" << endl;
+
 	pthread_mutex_unlock(&CThread::SharedResoursc);
 	try {
 		while (true) {
@@ -103,20 +108,27 @@ void * task(void* context) {
 				pthread_cond_wait(&thread->cond, &thread->SuspendMutex);
 
 			}
+			if (thread->isTerminated)
+			{
+				pthread_mutex_unlock(&thread->SuspendMutex);
+										break;
+			}
 			thread->_isRunning = true;
 
 			pthread_mutex_lock(&CThread::SharedResoursc);
 			thread->notifyALL(thread->_Event);
 			pthread_mutex_unlock(&CThread::SharedResoursc);
-			thread->getTask()->threadRunner();
-			thread->_isRunning = false;
-			//thread->cond = PTHREAD_COND_INITIALIZER;
-			pthread_mutex_lock(&CThread::SharedResoursc);
-			thread->notifyALL(thread->_Event);
-			pthread_mutex_unlock(&CThread::SharedResoursc);
+			cout<<"Thread id:-"<<thread->getThreadId()<<" Executes:- "<<endl;
+			Threadable* th=thread->getTask();
+			if(th)
+			th->threadRunner();
+//			thread->_isRunning = false;
+//			//thread->cond = PTHREAD_COND_INITIALIZER;
+//			pthread_mutex_lock(&CThread::SharedResoursc);
+//			thread->notifyALL(thread->_Event);
+//			pthread_mutex_unlock(&CThread::SharedResoursc);
 
-			if (thread->isTerminated)
-				break;
+
 			thread->suspend();
 			pthread_mutex_unlock(&thread->SuspendMutex);
 

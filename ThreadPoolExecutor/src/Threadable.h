@@ -14,7 +14,7 @@ class Threadable {
 public:
 	virtual void threadRunner()=0;
 
-	virtual ~Threadable(){std::cout<<" Threadable Destructor Called"<<std::endl;};
+	virtual ~Threadable(){/*std::cout<<" Threadable Destructor Called"<<std::endl;*/};
 };
 
 

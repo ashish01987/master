@@ -7,7 +7,7 @@
 
 #include "Threader.h"
 #include <iostream>
-
+#include "math.h"
  int  Threader::count=0;
  int  Threader1::count=0;
 Threader::Threader() {
@@ -23,7 +23,10 @@ Threader::~Threader() {
 
 void Threader::threadRunner()
 {
+	int k;
 	std::cout<<"Hi task1 "<<_id<<std::endl;
+	for(int i=1;i<10000;i++)
+			k=sqrt(i*100.8);
 }
  /* namespace datastructs */
 Threader1::Threader1() {
@@ -40,4 +43,7 @@ Threader1::~Threader1() {
 void Threader1::threadRunner()
 {
 	std::cout<<"Hi task2 "<<_id<<std::endl;
+	int k;
+	for(int i=1;i<10000;i++)
+		k=sqrt(i*100.8);
 }
