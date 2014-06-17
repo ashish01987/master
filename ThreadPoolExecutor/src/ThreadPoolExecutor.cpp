@@ -9,6 +9,10 @@
 #include "Events/Event.h"
 ThreadPoolExecutor::~ThreadPoolExecutor() {
 	// TODO Auto-generated destructor stub
+	if(Thread::__poolSync)
+		delete Thread::__poolSync;
+		Thread::__poolSync=NULL;
+		cout << "Thread Destroyed" << endl;
 	cout << "Pool Destroyed" << endl;
 }
 
@@ -100,16 +104,19 @@ void ThreadPoolExecutor::terminate() {
 	while (true) {
 		Thread::__poolSync->blockAllThreads();
 		if (_busythreads.empty()) {
+			Thread::__poolSync->releaseAllThreads();
 			break;
 		}
 		Thread::__poolSync->releaseAllThreads();
 	}
 	for (vector<std::tr1::shared_ptr<Thread> >::iterator it =
 			_liveThread.begin(); it != _liveThread.end(); ++it) {
+		Thread::__poolSync->blockAllThreads();
 		Threadable * t = NULL;
 		(*it)->removeAll();
 		//(*it)->setTask(*t);
 		(*it)->terminate();
+		Thread::__poolSync->releaseAllThreads();
 		(*it)->wait();
 	}
 }

@@ -32,7 +32,7 @@ public:
 			_queue(queue) {
 		d.reset(new ThreadDirector());
 		tf = d->getFactory(thread_type::CTHREAD);
-		createidleThread(2);
+		createidleThread(5);
 
 	}
 	;

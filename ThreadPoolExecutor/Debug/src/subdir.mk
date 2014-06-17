@@ -6,7 +6,6 @@
 CPP_SRCS += \
 ../src/CThread.cpp \
 ../src/CThreadFactory.cpp \
-../src/Driver.cpp \
 ../src/ThreadDirector.cpp \
 ../src/ThreadPoolExecutor.cpp \
 ../src/Threader.cpp \
@@ -15,7 +14,6 @@ CPP_SRCS += \
 OBJS += \
 ./src/CThread.o \
 ./src/CThreadFactory.o \
-./src/Driver.o \
 ./src/ThreadDirector.o \
 ./src/ThreadPoolExecutor.o \
 ./src/Threader.o \
@@ -24,7 +22,6 @@ OBJS += \
 CPP_DEPS += \
 ./src/CThread.d \
 ./src/CThreadFactory.d \
-./src/Driver.d \
 ./src/ThreadDirector.d \
 ./src/ThreadPoolExecutor.d \
 ./src/Threader.d \

@@ -17,10 +17,7 @@ int CThread::count=0;
 void * task(void* context);
 CThread::~CThread() {
 	// TODO Auto-generated destructor stub
-	if(__poolSync)
-	delete __poolSync;
-	__poolSync=NULL;
-	cout << "Thread Destroyed" << endl;
+
 }
 
 CThread::CThread() {
@@ -37,13 +34,24 @@ void CThread::createThread() {
 
 
 	 _Event.reset(new ThreadEvent(shared_from_this()));
-	pthread_create(&t, NULL, &task, (void*) this);
+	 pthread_attr_init(&attr);
+	     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	     try{
+	pthread_create(&t, &attr, &task, (LPVOID) this);
+	     }
+	     catch(...)
+	     {
+	    	 cout<<"Exception"<<endl;
+	     }
+
 }
 Threadable* CThread::getTask() {
 	return tk;
 }
 void CThread::terminate() {
+	pthread_mutex_lock(&SuspendMutex);
 	isTerminated = true;
+	pthread_mutex_unlock(&SuspendMutex);
 	run();
 }
 
@@ -84,6 +92,7 @@ void CThread::creleaseALLThreads()
 	pthread_mutex_unlock(&CThread::SharedResoursc);
 }
 void * task(void* context) {
+
 	//	while(!isTerminated)
 	//{
 	CThread* thread = ((CThread*) context);

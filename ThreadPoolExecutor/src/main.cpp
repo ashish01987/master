@@ -43,8 +43,8 @@ int main() {
 	ThreadPoolExecutor tex(p);
 
 	Threader th1[2000];
-	Threader1 th2[2000];
-	for (int i = 0; i < 2000; i++) {
+	Threader1 th2[100];
+	for (int i = 0; i < 100; i++) {
 		p->Enqueue(th1[i]);
 		p->Enqueue(th2[i]);
 	}

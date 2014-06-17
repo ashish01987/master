@@ -22,6 +22,7 @@ class CThread: public Thread {
 	void* (*task_wait)(void*);
 	static int count;
 	int id;
+	pthread_attr_t attr;
 protected:
 
 
